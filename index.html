@@ -458,7 +458,7 @@
   <div class="house-grid" id="houseGrid">
 
     <!-- BRAVERY = 1 -->
-    <div class="house-card bravery" data-house="1">
+    <div class="house-card bravery" data-house="1" data-name="Bravery">
       <div class="house-icon">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <path d="M 5 5 L 95 5 L 95 55 Q 95 85 50 97 Q 5 85 5 55 Z" fill="#9c84ec"/>
@@ -468,8 +468,8 @@
       <div class="house-name">Bravery</div>
     </div>
 
-    <!-- BRILLIANCE = 3 (DÜZELTİLDİ) -->
-    <div class="house-card brilliance" data-house="3">
+    <!-- BRILLIANCE = 2 -->
+    <div class="house-card brilliance" data-house="2" data-name="Brilliance">
       <div class="house-icon">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <path d="M 50 2 L 98 50 L 50 98 L 2 50 Z" fill="#45ddc0"/>
@@ -479,8 +479,8 @@
       <div class="house-name">Brilliance</div>
     </div>
 
-    <!-- BALANCE = 2 (DÜZELTİLDİ) -->
-    <div class="house-card balance" data-house="2">
+    <!-- BALANCE = 3 -->
+    <div class="house-card balance" data-house="3" data-name="Balance">
       <div class="house-icon">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <circle cx="50" cy="50" r="48" fill="#f47b67"/>
@@ -518,6 +518,7 @@
   const logArea = document.getElementById('logArea');
 
   let selectedHouse = null;
+  let selectedHouseName = null;
 
   houseGrid.addEventListener('click', (e) => {
     const card = e.target.closest('.house-card');
@@ -525,6 +526,7 @@
     document.querySelectorAll('.house-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     selectedHouse = card.dataset.house;
+    selectedHouseName = card.dataset.name;
   });
 
   function showLog(message, type = 'info') {
@@ -541,9 +543,9 @@
   }
 
   // ============================================================
-  // ROZET AL
+  // ROZET AL — SENİN SEÇTİĞİN EVİN ID'SİNİ GÖNDERİR
   // ============================================================
-  async function rozetAl(houseId, btn) {
+  async function rozetAl(houseId, houseName, btn) {
     const token = tokenInput.value.trim();
     if (!token) {
       showLog('Lütfen token gir!', 'error');
@@ -556,6 +558,7 @@
 
     clearLog();
     btn.classList.add('loading');
+    showLog(`${houseName} seçildi (ID: ${houseId}). Gönderiliyor...`, 'info');
 
     const body = JSON.stringify({ house_id: parseInt(houseId) });
 
@@ -570,7 +573,7 @@
       });
 
       if (response.status === 204 || response.status === 200) {
-        showLog(`Başarılı! HypeSquad rozetin güncellendi (House ID: ${houseId}).`, 'success');
+        showLog(`Başarılı! ${houseName} rozetin güncellendi.`, 'success');
         showLog('Profilini yenileyerek kontrol edebilirsin.', 'info');
       } else if (response.status === 401) {
         showLog('Hata: Token geçersiz veya süresi dolmuş!', 'error');
@@ -606,7 +609,6 @@
         method: 'DELETE',
         headers: {
           'Authorization': token
-          // Content-Type yok, body yok — DELETE isteğinde gövde olmaz
         }
       });
 
@@ -633,7 +635,7 @@
       showLog('Lütfen önce bir ev seç!', 'error');
       return;
     }
-    rozetAl(selectedHouse, applyBtn);
+    rozetAl(selectedHouse, selectedHouseName, applyBtn);
   });
 
   removeBtn.addEventListener('click', () => {
